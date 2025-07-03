@@ -6,12 +6,33 @@ from pathlib import Path
 
 
 def find_framepack_dir() -> Path:
+    """Locate the framepack repository directory.
+
+    The operator repository usually lives alongside the actual framepack
+    repository.  ``framepackoperator`` also matches the ``framepack*`` pattern
+    so we need to ignore our own directory when searching.
+    """
+
     repo_root = Path(__file__).resolve().parent
     parent = repo_root.parent
-    for p in parent.iterdir():
-        if p.is_dir() and p.name.startswith('framepack'):
-            return p
-    raise FileNotFoundError('framepack directory not found')
+
+    candidates = [
+        p
+        for p in parent.iterdir()
+        if p.is_dir()
+        and p.name.startswith("framepack")
+        and p != repo_root
+    ]
+
+    if not candidates:
+        raise FileNotFoundError("framepack directory not found")
+
+    # Prefer a directory named exactly 'framepack' if present for stability
+    for c in candidates:
+        if c.name == "framepack":
+            return c
+
+    return sorted(candidates)[0]
 
 
 def run_batch(framepack_dir: Path, cmd_args: str, work_dir: Path):
