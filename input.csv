@@ -1,0 +1,3 @@
+batch_name,args
+batch1,"--epochs 5 --video video1.mp4"
+batch2,"--epochs 10 --video video2.mp4"
